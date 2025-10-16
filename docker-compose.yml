@@ -15,7 +15,7 @@ services:
     ports:
       - "3009:3000"
     volumes:
-      - ./server/downloads:/app/downloads
+      - /home/cosinus/downloader:/app/downloads
       - ./server/uploads:/app/uploads
     networks:
       - truegis-network
