@@ -39,7 +39,6 @@ cp .env.docker.example .env
 ```env
 # ВАЖНО: Укажите URL вашей СУЩЕСТВУЮЩЕЙ MongoDB
 MONGODB_URI=mongodb://host.docker.internal:27017/truegis_delivery
-MONGO_URL=mongodb://host.docker.internal:27017/truegis_delivery
 
 # Ваш реальный Telegram Bot Token
 TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
@@ -49,6 +48,7 @@ JWT_SECRET=your_super_secret_key_min_32_chars
 ```
 
 **Для подключения к MongoDB на хосте:**
+
 - Используйте `host.docker.internal` (Docker Desktop на Mac/Windows)
 - Или IP адрес хоста: `mongodb://192.168.1.100:27017/truegis_delivery`
 - Или если MongoDB в другом контейнере: `mongodb://container-name:27017/truegis_delivery`
@@ -106,8 +106,8 @@ ports:
 
 ```yaml
 volumes:
-  - ./server/downloads:/app/downloads  # Видеофайлы
-  - ./server/uploads:/app/uploads      # Загруженные файлы
+  - ./server/downloads:/app/downloads # Видеофайлы
+  - ./server/uploads:/app/uploads # Загруженные файлы
 ```
 
 Файлы сохраняются на хосте, поэтому не теряются при перезапуске контейнера.
@@ -147,7 +147,7 @@ MONGODB_URI=mongodb://mongodb-container-name:27017/truegis_delivery
 ```yaml
 networks:
   truegis-network:
-    external: true  # Если сеть уже существует
+    external: true # Если сеть уже существует
 ```
 
 ---
@@ -171,7 +171,7 @@ pip install yt-dlp
 volumes:
   - ./server/downloads:/app/downloads
   - ./server/uploads:/app/uploads
-  - /usr/local/bin/yt-dlp:/usr/local/bin/yt-dlp  # Mount yt-dlp
+  - /usr/local/bin/yt-dlp:/usr/local/bin/yt-dlp # Mount yt-dlp
 ```
 
 ### Вариант 2: Отдельный контейнер для скачивания
@@ -355,4 +355,3 @@ docker-compose logs --tail=100 server
 ---
 
 Made with ❤️ for TrueGIS Platform
-

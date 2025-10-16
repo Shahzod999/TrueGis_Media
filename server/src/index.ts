@@ -133,11 +133,11 @@ app.get("/api/proxy/image", async (req, res) => {
       timeout: 10000,
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
-        "Referer": "https://www.instagram.com/",
-        "Origin": "https://www.instagram.com",
+        Referer: "https://www.instagram.com/",
+        Origin: "https://www.instagram.com",
         "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"Windows"',
@@ -158,13 +158,13 @@ app.get("/api/proxy/image", async (req, res) => {
     res.send(response.data);
   } catch (error: any) {
     console.error("Error proxying image:", error.message);
-    
+
     // Return a 1x1 transparent pixel as fallback
     const transparentPixel = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
       "base64"
     );
-    
+
     res.set("Content-Type", "image/png");
     res.status(200).send(transparentPixel);
   }
@@ -193,7 +193,7 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
 app.listen(port, () => {
   console.log(`Server running on port: ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`MongoDB URL: ${process.env.MONGO_URL ? "Configured" : "Not configured"}`);
+  console.log(`MongoDB URL: ${process.env.MONGODB_URI ? "Configured" : "Not configured"}`);
 });
 
 // Экспортируем app для Vercel
