@@ -1,0 +1,55 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+instruction.md
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Node modules
+node_modules
+client/node_modules
+server/node_modules
+
+# Build artifacts (will be built inside container)
+client/dist
+client/build
+
+# Development files
+*.log
+logs/
+*.tmp
+*.temp
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Docker files
+docker-compose.override.yml
+Dockerfile.dev
+
+# Development dependencies
+server/uploads
+
+# Test files
+*.test.js
+*.spec.js
+test/
+tests/
+__tests__/
+
+# Coverage
+coverage/

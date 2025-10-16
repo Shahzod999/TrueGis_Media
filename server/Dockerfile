@@ -1,23 +1,32 @@
 FROM node:18-alpine
 
+# Install yt-dlp and ffmpeg for video downloading
+RUN apk add --no-cache python3 py3-pip ffmpeg && \
+    pip3 install --no-cache-dir yt-dlp
+
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
-# Copy the rest of the application
+# Copy source files
 COPY . .
 
 # Build TypeScript
-RUN npm run clean && \
-    npm run build || \
-    (echo "Build failed, but continuing..." && exit 0)
+RUN npm run build
 
-# Expose the port your app runs on
+# Create downloads directory
+RUN mkdir -p /app/downloads /app/uploads
+
+# Expose the port
 EXPOSE 3000
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
+  CMD node -e "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
 # Start the application
-CMD ["npm", "start"] 
+CMD ["node", "dist/index.js"] 

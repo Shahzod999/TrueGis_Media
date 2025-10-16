@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: truegis-video-server
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGO_URL=${MONGO_URL}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
+      - DOWNLOAD_PATH=/app/downloads
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server/downloads:/app/downloads
+      - ./server/uploads:/app/uploads
+    networks:
+      - truegis-network
+
+networks:
+  truegis-network:
+    driver: bridge
+    name: truegis-network
