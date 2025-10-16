@@ -4,11 +4,10 @@ services:
       context: ./server
       dockerfile: Dockerfile
     container_name: truegis-video-server
-    ports:
-      - "3009:3000"
+    network_mode: host
     environment:
       - NODE_ENV=production
-      - PORT=${PORT}
+      - PORT=3009
       - MONGODB_URI=mongodb://127.0.0.1:27017/truegis_delivery?authSource=truegis_delivery
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
