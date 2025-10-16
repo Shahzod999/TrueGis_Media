@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 // тестирование
 const botStart = async () => {
-  const token = process.env.JWT_SECRET || "";
+  const token = process.env.TELEGRAM_BOT_TOKEN || "";
   const webAppUrl = process.env.WEB_APP_URL || "https://gxfl20sh-5173.euw.devtunnels.ms";
   const bot = new TelegramBot(token, { polling: true });
 

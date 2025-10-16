@@ -53,6 +53,8 @@ export const downloadVideo = async (req: Request, res: Response) => {
     const uniqueName = generateUniqueFilename();
     const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
     const videoPath = path.join(downloadPath, `${uniqueName}.mp4`);
+    
+    console.log(`📂 DOWNLOAD_PATH: ${downloadPath}`);
 
     console.log(`📥 Downloading video from: ${url}`);
     console.log(`💾 Saving to: ${videoPath}`);
@@ -240,8 +242,11 @@ export const downloadAudio = async (req: Request, res: Response) => {
     }
 
     const uniqueName = generateUniqueFilename();
-    const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd());
-    const audioPath = path.join(downloadPath, "downloads", `${uniqueName}.mp3`);
+    const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
+    const audioPath = path.join(downloadPath, `${uniqueName}.mp3`);
+
+    console.log(`🎵 Downloading audio from: ${url}`);
+    console.log(`💾 Saving to: ${audioPath}`);
 
     // Download audio using yt-dlp
     const command = `yt-dlp -f "bestaudio/best" -x --audio-format mp3 -o "${audioPath}" "${url}"`;

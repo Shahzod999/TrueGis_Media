@@ -10,7 +10,7 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
-      - DOWNLOAD_PATH=/app/downloads
+      - DOWNLOAD_PATH=${DOWNLOAD_PATH}
     restart: unless-stopped
     ports:
       - "3009:3000"

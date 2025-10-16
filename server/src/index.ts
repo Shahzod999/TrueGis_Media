@@ -28,6 +28,8 @@ const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "down
 if (!fs.existsSync(downloadPath)) {
   fs.mkdirSync(downloadPath, { recursive: true });
   console.log(`📁 Created downloads directory: ${downloadPath}`);
+} else {
+  console.log(`📂 Using downloads directory: ${downloadPath}`);
 }
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
