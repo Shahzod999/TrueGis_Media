@@ -1,8 +1,8 @@
 FROM node:18-alpine
 
-# Install yt-dlp and ffmpeg for video downloading
-RUN apk add --no-cache python3 py3-pip ffmpeg && \
-    pip3 install --no-cache-dir yt-dlp
+# Install ffmpeg for video processing
+# Note: yt-dlp должен быть установлен на хост-системе
+RUN apk add --no-cache ffmpeg
 
 WORKDIR /app
 
