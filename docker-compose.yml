@@ -9,26 +9,13 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=${PORT}
-      - MONGODB_URI=mongodb://mongo:27017/truegis_delivery?authSource=truegis_delivery
+      - MONGODB_URI=mongodb://172.17.0.1:27017/truegis_delivery?authSource=truegis_delivery
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
       - DOWNLOAD_PATH=${DOWNLOAD_PATH}
-    depends_on:
-      - mongo
+    networks:
+      - truegis-network
     restart: unless-stopped
     volumes:
       - /home/cosinus/downloader:/app/downloads
       - ./server/uploads:/app/uploads
-
-  mongo:
-    image: mongo
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    restart: always
-
-# Используем default network чтобы подключиться к существующему контейнеру mongo
-volumes:
-  mongo-data:
