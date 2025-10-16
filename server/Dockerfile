@@ -9,14 +9,17 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
 # Copy source files
 COPY . .
 
 # Build TypeScript
 RUN npm run build
+
+# Remove devDependencies after build
+RUN npm prune --production
 
 # Create downloads directory
 RUN mkdir -p /app/downloads /app/uploads
