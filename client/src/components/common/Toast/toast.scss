@@ -1,0 +1,65 @@
+.square {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: color-mix(in srgb, var(--secondary-bg-color), transparent 80%);
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 999;
+
+
+
+    &__box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+        width: 270px;
+
+        border-radius: 14px;
+        backdrop-filter: blur(80px);
+        background-color: var(--bg-color);
+
+        &__text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            padding: 19px 18px;
+
+
+            p {
+                font-family: var(--font6);
+                font-weight: 400;
+                font-size: 13px;
+                line-height: 138%;
+                letter-spacing: -0.03em;
+                text-align: center;
+                color: var(--text-color);
+            }
+        }
+
+
+        button {
+            text-align: center;
+            border: none;
+            border-top: 0.5px solid var(--separator-color);
+            width: 100%;
+            padding: 11px 0;
+            font-weight: 590;
+            font-size: 17px;
+            line-height: 129%;
+            letter-spacing: -0.02em;
+            color: var(--link-color);
+            cursor: pointer;
+            background: transparent;
+            cursor: pointer;
+
+        }
+    }
+}

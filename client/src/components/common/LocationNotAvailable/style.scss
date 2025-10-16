@@ -1,0 +1,24 @@
+.distance--warning {
+    display: flex;
+    align-items: center;
+    white-space: wrap;
+    gap: 4px;
+    padding: 16px;
+    cursor: pointer;
+
+    div {
+        display: flex;
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+        padding-top: 3px;
+        fill: var(--tg-theme-text-color, #000);
+
+        path {
+            fill: var(--tg-theme-text-color, #000);
+        }
+    }
+
+}

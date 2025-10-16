@@ -1,0 +1,55 @@
+{
+    "common": {
+      "loading": "Yuklanmoqda...",
+      "error": "Xatolik",
+      "success": "Muvaffaqiyatli"
+    },
+    "auth": {
+      "login": "Kirish",
+      "logout": "Chiqish",
+      "username": "Foydalanuvchi nomi",
+      "password": "Parol",
+      "loginError": "Noto'g'ri foydalanuvchi nomi yoki parol"
+    },
+    "navigation": {
+      "home": "Bosh sahifa",
+      "admin": "Admin panel",
+      "downloader": "Yuklovchi",
+      "search": "Qidiruv",
+      "settings": "Sozlamalar"
+    },
+    "admin": {
+      "welcome": "Admin panelga xush kelibsiz"
+    },
+    "home": {
+      "welcome": "Xush kelibsiz",
+      "openMenu": "Menyuni ochish"
+    },
+    "settings": {
+      "languages": "Tillar",
+      "errorGeolocation": "Geolokatsiyani olishda xatolik.",
+      "turnOnlocation": "Bosib, joylashuvni yoqing"
+    },
+    "downloader": {
+      "title": "Videoni yuklash",
+      "subtitle": "Mashhur ijtimoiy tarmoqlardan videolarni yuklang",
+      "placeholder": "Video havolasini joylashtiring...",
+      "download": "Yuklash",
+      "downloading": "Yuklanmoqda...",
+      "popular": "Mashhur",
+      "myVideos": "Mening videolarim",
+      "noVideos": "Mashhur videolar yo'q",
+      "noUserVideos": "Sizda hali yuklab olingan videolar yo'q",
+      "success": {
+        "downloaded": "Video muvaffaqiyatli yuklandi!",
+        "deleted": "Video o'chirildi"
+      },
+      "errors": {
+        "emptyUrl": "Iltimos, video havolasini kiriting",
+        "downloadFailed": "Videoni yuklashda xatolik",
+        "deleteFailed": "Videoni o'chirishda xatolik",
+        "loadFailed": "Videolarni yuklashda xatolik"
+      }
+    }
+  }
+  

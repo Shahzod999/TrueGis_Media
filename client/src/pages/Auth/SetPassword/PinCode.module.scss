@@ -1,0 +1,142 @@
+.pinCode {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    height: 100%;
+    overflow: hidden !important;
+    background-color: var(--secondary-bg-color);
+}
+
+.title {
+    margin-bottom: 20px;
+
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 129%;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.dots {
+    display: flex;
+    gap: 21px;
+    margin-bottom: 50px;
+}
+
+.dots span {
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--hint-color);
+    border-radius: 50%;
+    background: var(--bg-color);
+    transition: background 0.3s;
+}
+
+.dots .filled {
+    background: var(--hint-color);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 27px;
+    row-gap: 14px;
+    margin-bottom: 20px;
+
+
+    button {
+        width: 77px;
+        height: 77px;
+        border-radius: 50%;
+        border: none;
+
+
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .letters {
+            font-family: var(--font-family);
+            font-weight: 600;
+            font-size: 9px;
+            letter-spacing: 0.27em;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .number {
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 35px;
+            letter-spacing: 0.01em;
+            color: var(--text-color);
+        }
+    }
+}
+
+
+
+.button {
+    background: var(--bg-color);
+}
+
+.biometricButton {
+    background-color: transparent;
+
+    svg {
+        width: 40px;
+        height: 40px;
+
+        path {
+            fill: var(--text-color);
+        }
+    }
+}
+
+
+.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    .forgotPassword {
+        font-family: var(--font-family);
+        font-weight: 500;
+        font-size: 17px;
+        line-height: 129%;
+        letter-spacing: -0.02em;
+        text-align: center;
+        color: var(--hint-color);
+    }
+}
+
+.button:active {
+    background: #ddd;
+}
+
+.resetInput {
+    padding: 0 40px;
+    margin-bottom: 16px;
+
+    input {
+        width: 100%;
+        padding: 15px 10px;
+        border-radius: 10px;
+        background-color: var(--bg-color);
+        font-family: var(--font-family);
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 129%;
+        letter-spacing: -0.02em;
+        text-align: center;
+        color: var(--text-color);
+    }
+}

@@ -1,0 +1,54 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "loginError": "Invalid username or password"
+  },
+  "navigation": {
+    "home": "Home",
+    "admin": "Admin Panel",
+    "downloader": "Downloader",
+    "search": "Search",
+    "settings": "Settings"
+  },
+  "admin": {
+    "welcome": "Welcome to Admin Panel"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "openMenu": "Open Menu"
+  },
+  "settings": {
+    "languages": "Languages",
+    "errorGeolocation": "Error obtaining geolocation.",
+    "turnOnlocation": "Click to turn on location"
+  },
+  "downloader": {
+    "title": "Download Video",
+    "subtitle": "Download videos from popular social networks",
+    "placeholder": "Paste video link...",
+    "download": "Download",
+    "downloading": "Downloading...",
+    "popular": "Popular",
+    "myVideos": "My Videos",
+    "noVideos": "No popular videos",
+    "noUserVideos": "You don't have any downloaded videos yet",
+    "success": {
+      "downloaded": "Video downloaded successfully!",
+      "deleted": "Video deleted"
+    },
+    "errors": {
+      "emptyUrl": "Please enter a video link",
+      "downloadFailed": "Failed to download video",
+      "deleteFailed": "Failed to delete video",
+      "loadFailed": "Failed to load videos"
+    }
+  }
+} 

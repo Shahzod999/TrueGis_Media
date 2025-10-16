@@ -1,0 +1,92 @@
+.tab-bar {
+    border-top: 0.5px solid var(--separator-color);
+    background-color: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 4px;
+    padding: 8px;
+    padding-bottom: max(8px, var(--tg-content-safe-area-inset-bottom, 8px));
+
+    &__item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 4px;
+        border-radius: 12px;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: var(--hint-color);
+
+        img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .icon {
+            svg {
+                width: 28px;
+                height: 28px;
+                fill: var(--hint-color);
+                stroke: var(--hint-color);
+            }
+        }
+
+        .label {
+            font-size: 11px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        &__active {
+            background-color: color-mix(in srgb, var(--button-color), transparent 80%);
+            color: var(--button-color);
+
+            .icon svg {
+                fill: var(--button-color);
+                stroke: var(--button-color);
+            }
+        }
+
+        &-upload {
+            flex: 0;
+            padding: 0;
+            
+            .upload-btn {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                transition: all 0.3s;
+
+                .icon {
+                    font-size: 32px;
+                    color: white;
+                    font-weight: 300;
+                    line-height: 1;
+                }
+            }
+
+            &:active .upload-btn {
+                transform: scale(0.9);
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            }
+
+            &.tab-bar__item__active .upload-btn {
+                transform: scale(1.1);
+                box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+            }
+        }
+
+        &:active:not(&-upload) {
+            transform: scale(0.95);
+        }
+    }
+}

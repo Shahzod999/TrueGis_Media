@@ -1,0 +1,272 @@
+.video-uploader {
+  background: var(--secondary-bg-color);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--separator-color);
+
+  .uploader-header {
+    margin-bottom: 20px;
+
+    .uploader-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-color);
+      margin: 0 0 8px 0;
+    }
+
+    .uploader-subtitle {
+      font-size: 14px;
+      color: var(--hint-color);
+      margin: 0;
+    }
+  }
+
+  .uploader-form {
+    .form-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-color);
+        border: 1px solid var(--separator-color);
+        border-radius: 8px;
+        color: var(--text-color);
+        font-size: 15px;
+        transition: all 0.2s;
+
+        &::placeholder {
+          color: var(--hint-color);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: var(--button-color);
+          background: var(--bg-color);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      .platform-badge {
+        margin-top: 8px;
+
+        .badge {
+          display: inline-block;
+          padding: 4px 12px;
+          background: color-mix(in srgb, var(--button-color), transparent 80%);
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-color);
+        }
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+        padding: 16px;
+        background: var(--bg-color);
+        border-radius: 8px;
+        transition: background 0.2s;
+
+        &:hover {
+          background: color-mix(in srgb, var(--button-color), transparent 80%);
+        }
+
+        input[type="checkbox"] {
+          width: 22px;
+          height: 22px;
+          cursor: pointer;
+          accent-color: var(--button-color);
+        }
+
+        span {
+          color: var(--text-color);
+          font-size: 15px;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px 24px;
+      margin-top: 8px;
+      background: color-mix(in srgb, var(--button-color), transparent 80%);
+      border: none;
+      border-radius: 16px;
+      color: var(--text-color);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--button-color), transparent 80%);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px color-mix(in srgb, var(--button-color), transparent 80%);
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid color-mix(in srgb, var(--button-color), transparent 80%);
+        border-top-color: var(--text-color);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    }
+
+    .success-message,
+    .error-message {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .success-message {
+      background: color-mix(in srgb, var(--success-color), transparent 80%);
+      border: 1px solid var(--separator-color);
+      color: var(--success-color);
+    }
+
+    .error-message {
+      background: color-mix(in srgb, var(--destructive-color), transparent 80%);
+      border: 1px solid var(--separator-color);
+      color: var(--destructive-color);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .supported-platforms {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--separator-color);
+
+    .platforms-title {
+      font-size: 13px;
+      color: var(--hint-color);
+      margin: 0 0 16px 0;
+      font-weight: 600;
+    }
+
+    .platforms-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      .platform-chip {
+        padding: 8px 16px;
+        background: color-mix(in srgb, var(--button-color), transparent 80%);
+        border: 1px solid var(--separator-color);
+        border-radius: 20px;
+        font-size: 13px;
+        color: var(--text-color);
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:hover {
+          background: color-mix(in srgb, var(--button-color), transparent 80%);
+          border-color: var(--separator-color);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .video-uploader {
+    padding: 20px 16px;
+    border-radius: 12px;
+
+    .uploader-header {
+      .uploader-title {
+        font-size: 20px;
+      }
+
+      .uploader-subtitle {
+        font-size: 13px;
+      }
+    }
+
+    .uploader-form {
+      .submit-btn {
+        padding: 14px 20px;
+        font-size: 16px;
+      }
+
+      .checkbox-label {
+        padding: 14px;
+
+        span {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .supported-platforms {
+      .platforms-title {
+        font-size: 12px;
+      }
+
+      .platforms-list {
+        gap: 8px;
+
+        .platform-chip {
+          font-size: 12px;
+          padding: 6px 12px;
+        }
+      }
+    }
+  }
+}

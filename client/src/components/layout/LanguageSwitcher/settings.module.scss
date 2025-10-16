@@ -1,0 +1,64 @@
+
+
+.lang {
+    padding: 16px;
+    height: 100%;
+
+    .title {
+        font-family: var(--second-family);
+        font-weight: 700;
+        font-size: 34px;
+        line-height: 121%;
+        letter-spacing: 0.01em;
+        color: var(--text-color);
+        margin-bottom: 16px;
+    }
+
+    .langBox {
+        background-color: var(--bg-color);
+        border-radius: 10px;
+        overflow: hidden;
+
+        .tabs {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+
+            strong {
+                font-family: var(--font-family);
+                font-weight: 600;
+                font-size: 17px;
+                line-height: 129%;
+                letter-spacing: -0.02em;
+                color: var(--text-color);
+                display: block;
+            }
+
+            span {
+                font-family: var(--font-family);
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 143%;
+                letter-spacing: -0.02em;
+                color: var(--text-color);
+            }
+
+            &:not(:last-child):after {
+                content: "";
+                position: absolute;
+                left: -20%;
+                bottom: 0;
+                width: 150%;
+                margin-top: 5px;
+                height: 1px;
+                background-color: var(--separator-color);
+                display: block;
+                border-radius: 10px;
+                opacity: 0.5;
+            }
+        }
+    }
+}

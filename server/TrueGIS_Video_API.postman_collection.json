@@ -1,0 +1,611 @@
+{
+	"info": {
+		"_postman_id": "truegis-video-api-collection",
+		"name": "TrueGIS Social Video API",
+		"description": "Complete API collection for TrueGIS Instagram Reels-style video management system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "📱 Video Feed",
+			"item": [
+				{
+					"name": "Get Video Feed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/feed?page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "feed"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Videos per page"
+								},
+								{
+									"key": "category",
+									"value": "",
+									"description": "Filter by category",
+									"disabled": true
+								},
+								{
+									"key": "platform",
+									"value": "",
+									"description": "Filter by platform (instagram, tiktok, youtube)",
+									"disabled": true
+								},
+								{
+									"key": "user_id",
+									"value": "",
+									"description": "Filter by user telegram_id",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated video feed with infinite scroll support"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trending Videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/trending?limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "trending"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of trending videos"
+								}
+							]
+						},
+						"description": "Get trending videos based on views and likes in last 24 hours"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/search?q=dance&page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "dance",
+									"description": "Search query (required)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Results per page"
+								}
+							]
+						},
+						"description": "Search videos by title, description, tags, or user name"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🎬 Single Video",
+			"item": [
+				{
+					"name": "Get Video by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}"]
+						},
+						"description": "Get detailed information about a specific video"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Video Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}/stats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}", "stats"]
+						},
+						"description": "Get comprehensive statistics and analytics for a video"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👆 User Interactions",
+			"item": [
+				{
+					"name": "Record View",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": {{user_id}},\n  \"watch_time\": 8\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}/view",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}", "view"]
+						},
+						"description": "Record a view for a video and update watch time analytics"
+					},
+					"response": []
+				},
+				{
+					"name": "Like Video",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}/like",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}", "like"]
+						},
+						"description": "Toggle like on a video. If already liked, removes the like."
+					},
+					"response": []
+				},
+				{
+					"name": "Dislike Video",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}/dislike",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}", "dislike"]
+						},
+						"description": "Toggle dislike on a video. Removes like if exists."
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Favorite",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}/favorite",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}", "favorite"]
+						},
+						"description": "Add or remove video from user's favorites"
+					},
+					"response": []
+				},
+				{
+					"name": "Share Video",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}/share",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}", "share"]
+						},
+						"description": "Record a share action for a video"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👤 User Content",
+			"item": [
+				{
+					"name": "Get User Favorites",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/user/{{user_id}}/favorites?page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "user", "{{user_id}}", "favorites"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Videos per page"
+								}
+							]
+						},
+						"description": "Get paginated list of videos favorited by a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Uploaded Videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/user/{{user_id}}/uploaded?page=1&limit=10&include_deleted=false",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "user", "{{user_id}}", "uploaded"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Videos per page"
+								},
+								{
+									"key": "include_deleted",
+									"value": "false",
+									"description": "Include deleted videos (true/false)"
+								}
+							]
+						},
+						"description": "Get all videos uploaded by a specific user (by telegram_id)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🛠 Video Management",
+			"item": [
+				{
+					"name": "Update Video",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Amazing Dance Video\",\n  \"description\": \"Check out this incredible performance!\",\n  \"tags\": [\"dance\", \"performance\", \"viral\"],\n  \"category\": \"entertainment\",\n  \"is_public\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}"]
+						},
+						"description": "Update video metadata (admin/owner only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Video (Soft Delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/videos/{{video_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "videos", "{{video_id}}"]
+						},
+						"description": "Soft delete a video (sets is_deleted to true)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📥 Video Download & Upload",
+			"item": [
+				{
+					"name": "Download Video from URL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"url\": \"https://www.instagram.com/reel/DPBnnDeCNlE/\",\n  \"user\": {\n    \"telegram_id\": {{user_id}},\n    \"telegram_name\": \"Shahzod\",\n    \"telegram_username\": \"promise_resolved\"\n  },\n  \"is_public\": true,\n  \"tags\": [\"instagram\", \"reel\"],\n  \"category\": \"entertainment\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/download/download",
+							"host": ["{{base_url}}"],
+							"path": ["api", "download", "download"]
+						},
+						"description": "Download video from URL using yt-dlp and save to database"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Video File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "video",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "user",
+									"value": "{\"telegram_id\": {{user_id}}, \"telegram_name\": \"Shahzod\", \"telegram_username\": \"promise_resolved\"}",
+									"type": "text"
+								},
+								{
+									"key": "source_url",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "My Video",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "Video description",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "[\"tag1\", \"tag2\"]",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "is_public",
+									"value": "true",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/download/upload",
+							"host": ["{{base_url}}"],
+							"path": ["api", "download", "upload"]
+						},
+						"description": "Upload video file directly (multipart/form-data)"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Audio from URL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/download/download-audio",
+							"host": ["{{base_url}}"],
+							"path": ["api", "download", "download-audio"]
+						},
+						"description": "Download audio (MP3) from video URL"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Video File",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/download/file/:filename",
+							"host": ["{{base_url}}"],
+							"path": ["api", "download", "file", ":filename"],
+							"variable": [
+								{
+									"key": "filename",
+									"value": "1760616685204_7a6750576f3e6e52.mp4"
+								}
+							]
+						},
+						"description": "Serve/stream video file"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Video File",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/download/file/{{video_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "download", "file", "{{video_id}}"]
+						},
+						"description": "Delete video file from disk and mark as deleted in database"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🖼️ Image Proxy",
+			"item": [
+				{
+					"name": "Proxy External Image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/proxy/image?url=https://instagram.ftas3-2.fna.fbcdn.net/v/t51.2885-15/552944717_18527697142060004_998334135190438359_n.jpg",
+							"host": ["{{base_url}}"],
+							"path": ["api", "proxy", "image"],
+							"query": [
+								{
+									"key": "url",
+									"value": "https://instagram.ftas3-2.fna.fbcdn.net/v/t51.2885-15/552944717_18527697142060004_998334135190438359_n.jpg",
+									"description": "External image URL (Instagram, TikTok, etc.)"
+								}
+							]
+						},
+						"description": "Proxy external images to bypass CORS and referer restrictions"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔍 Test & Health",
+			"item": [
+				{
+					"name": "API Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						},
+						"description": "Check if API is working"
+					},
+					"response": []
+				},
+				{
+					"name": "API Routes Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api",
+							"host": ["{{base_url}}"],
+							"path": ["api"]
+						},
+						"description": "Get available API routes"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "video_id",
+			"value": "68f0e0f2a6fa3cace66c523e",
+			"type": "string",
+			"description": "ID of a video (get from feed endpoint)"
+		},
+		{
+			"key": "user_id",
+			"value": "7632668745",
+			"type": "string",
+			"description": "Telegram user ID"
+		}
+	]
+}
+
