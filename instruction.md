@@ -6,7 +6,6 @@ root
 
 cd /opt/projects/TrueGisMedia
 
-
 client
 
 npm i
