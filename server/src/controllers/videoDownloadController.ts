@@ -51,10 +51,8 @@ export const downloadVideo = async (req: Request, res: Response) => {
 
     // Generate unique filename
     const uniqueName = generateUniqueFilename();
-    const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
+    const downloadPath = path.join(process.cwd(), "downloads");
     const videoPath = path.join(downloadPath, `${uniqueName}.mp4`);
-    
-    console.log(`📂 DOWNLOAD_PATH: ${downloadPath}`);
 
     console.log(`📥 Downloading video from: ${url}`);
     console.log(`💾 Saving to: ${videoPath}`);
@@ -242,7 +240,7 @@ export const downloadAudio = async (req: Request, res: Response) => {
     }
 
     const uniqueName = generateUniqueFilename();
-    const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
+    const downloadPath = path.join(process.cwd(), "downloads");
     const audioPath = path.join(downloadPath, `${uniqueName}.mp3`);
 
     console.log(`🎵 Downloading audio from: ${url}`);
@@ -280,7 +278,7 @@ export const downloadAudio = async (req: Request, res: Response) => {
 export const getVideoFile = async (req: Request, res: Response) => {
   try {
     const { filename } = req.params;
-    const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
+    const downloadPath = path.join(process.cwd(), "downloads");
     const videoPath = path.join(downloadPath, filename);
 
     // Check if file exists
@@ -312,7 +310,7 @@ export const deleteVideoFile = async (req: Request, res: Response) => {
     }
 
     // Delete file from disk
-    const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
+    const downloadPath = path.join(process.cwd(), "downloads");
     const videoPath = path.join(downloadPath, video.url);
 
     try {

@@ -11,8 +11,7 @@ services:
       - MONGODB_URI=mongodb://127.0.0.1:27017/truegis_delivery?authSource=truegis_delivery
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
-      - DOWNLOAD_PATH=${DOWNLOAD_PATH}
     restart: unless-stopped
     volumes:
-      - /home/cosinus/downloader:/app/downloads
+      - ./server/downloads:/app/downloads
       - ./server/uploads:/app/uploads

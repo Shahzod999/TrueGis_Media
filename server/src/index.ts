@@ -24,7 +24,7 @@ try {
 connectDB();
 
 // Create downloads directory if it doesn't exist
-const downloadPath = process.env.DOWNLOAD_PATH || path.join(process.cwd(), "downloads");
+const downloadPath = path.join(process.cwd(), "downloads");
 if (!fs.existsSync(downloadPath)) {
   fs.mkdirSync(downloadPath, { recursive: true });
   console.log(`📁 Created downloads directory: ${downloadPath}`);
