@@ -17,7 +17,8 @@ const TabBar = () => {
       <Link to="/upload" className={`tab-bar__item tab-bar__item-upload ${pathname === "/upload" && "tab-bar__item__active"}`}>
         <div className="upload-btn">
           <span className="icon">
-            <SVG src="/svg/upload.svg" />
+            {/* <SVG src="/svg/upload.svg" /> */}
+            <img src="/trueGis.png" alt="upload" />
           </span>
         </div>
       </Link>
