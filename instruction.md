@@ -31,7 +31,7 @@ docker-compose ps
 
 # 6. Проверьте логи сервера
 
-docker-compose logs server
+docker-compose logs -f truegis-video-server
 
 # 7. Проверьте логи nginx
 
