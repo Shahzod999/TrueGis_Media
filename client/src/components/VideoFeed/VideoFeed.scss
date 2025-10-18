@@ -125,19 +125,20 @@
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     border-radius: 50%;
+    padding: 4px;
     width: 36px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
     z-index: 5;
     pointer-events: none;
     transition: opacity 0.3s;
+    opacity: 0.5;
 
     svg {
-      width: 10px;
-      height: 10px;
+      width: 100%;
+      height: 100%;
       fill: white;
     }
   }
@@ -194,13 +195,28 @@
 
     .description-container {
       margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
 
       .description {
-        color: white;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 14px;
         margin: 0;
         line-height: 1.4;
-        display: inline;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: all 0.3s ease;
+      }
+
+      &.expanded {
+        .description {
+          color: white;
+          white-space: normal;
+          overflow: visible;
+          text-overflow: clip;
+        }
       }
 
       .expand-btn {
@@ -211,9 +227,9 @@
         font-weight: 600;
         cursor: pointer;
         padding: 0;
-        margin-left: 6px;
         text-decoration: none;
         transition: color 0.2s;
+        align-self: flex-start;
 
         &:hover {
           color: white;
@@ -226,9 +242,18 @@
     }
 
     .stats {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       color: rgba(255, 255, 255, 0.8);
       font-size: 13px;
       margin-bottom: 8px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        fill: rgba(255, 255, 255, 0.8);
+      }
     }
 
     .tags {

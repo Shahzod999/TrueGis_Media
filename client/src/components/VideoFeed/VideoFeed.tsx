@@ -12,13 +12,43 @@ import {
 import "./VideoFeed.scss";
 import SVG from "react-inlinesvg";
 
-// Mock user - replace with real user from Telegram WebApp
+// ======================== Constants ========================
+const MAX_DESCRIPTION_LENGTH = 100;
+const VIEW_RECORD_DELAY = 3000;
+const SCROLL_THROTTLE_DELAY = 100;
+const PRELOAD_THRESHOLD = 3;
+const INTERSECTION_THRESHOLD = 0.7;
+const VOLUME_INDICATOR_TIMEOUT = 1000;
+
+// ======================== Helpers ========================
+/**
+ * Get current user from Telegram WebApp
+ */
 const getCurrentUser = () => ({
   telegram_id: window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 7632668745,
   telegram_name: window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || "User",
   telegram_username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username,
 });
 
+/**
+ * Format count for display (1K, 1M, etc)
+ */
+const formatCount = (count: number): string => {
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+  return count.toString();
+};
+
+/**
+ * Get video URL with proper base URL
+ */
+const getVideoUrl = (videoUrl: string): string => {
+  if (videoUrl.startsWith("http")) return videoUrl;
+  const apiBaseUrl = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:3000";
+  return `${apiBaseUrl}/downloads/${videoUrl}`;
+};
+
+// ======================== Types ========================
 interface VideoItemProps {
   video: Video;
   isActive: boolean;
@@ -29,55 +59,82 @@ interface VideoItemProps {
   onShare: (id: string) => void;
 }
 
+// ======================== VideoItem Component ========================
 const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite, onShare }: VideoItemProps) => {
+  // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
+  const viewRecordedRef = useRef(false);
+  const viewTimerRef = useRef<number | undefined>(undefined);
+
+  // Local state
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [localLikeCount, setLocalLikeCount] = useState(video.like_count);
   const [localFavoriteCount, setLocalFavoriteCount] = useState(video.favorite_count);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  // API mutations
   const [recordView] = useRecordViewMutation();
 
-  const MAX_DESCRIPTION_LENGTH = 100;
-
+  // ========== Effect: Handle video playback on active state change ==========
   useEffect(() => {
-    if (!videoRef.current) return;
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
 
-    const playVideo = async () => {
+    const handlePlayback = async () => {
       try {
-        if (isActive && videoRef.current) {
-          // Сбрасываем видео чтобы начать с начала
-          videoRef.current.currentTime = 0;
-          videoRef.current.muted = isMuted;
+        if (isActive) {
+          // Start video from beginning
+          videoElement.currentTime = 0;
+          await videoElement.play();
 
-          // Пытаемся воспроизвести
-          await videoRef.current.play();
+          // Record view after delay (only once)
+          if (!viewRecordedRef.current) {
+            viewTimerRef.current = setTimeout(() => {
+              const user = getCurrentUser();
+              recordView({
+                id: video._id,
+                body: {
+                  user_id: user.telegram_id,
+                  watch_time: 3,
+                },
+              });
+              viewRecordedRef.current = true;
+            }, VIEW_RECORD_DELAY);
+          }
+        } else {
+          // Pause and reset video
+          videoElement.pause();
+          videoElement.currentTime = 0;
 
-          // Record view after 3 seconds
-          const timer = setTimeout(() => {
-            const user = getCurrentUser();
-            recordView({
-              id: video._id,
-              body: {
-                user_id: user.telegram_id,
-                watch_time: 3,
-              },
-            });
-          }, 3000);
-
-          return () => clearTimeout(timer);
-        } else if (videoRef.current) {
-          videoRef.current.pause();
-          videoRef.current.currentTime = 0; // Сбрасываем время для следующего воспроизведения
+          // Reset view tracking
+          viewRecordedRef.current = false;
+          if (viewTimerRef.current) {
+            clearTimeout(viewTimerRef.current);
+          }
         }
       } catch (error) {
-        console.error("Error playing video:", error);
+        console.error("Error controlling video playback:", error);
       }
     };
 
-    playVideo();
-  }, [isActive, video._id, recordView, isMuted]);
+    handlePlayback();
 
+    return () => {
+      if (viewTimerRef.current) {
+        clearTimeout(viewTimerRef.current);
+      }
+    };
+  }, [isActive, video._id, recordView]);
+
+  // ========== Effect: Handle mute state changes (separate from playback) ==========
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  // ========== Event Handlers ==========
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsLiked(!isLiked);
@@ -92,16 +149,10 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
     onFavorite(video._id);
   };
 
-  const formatCount = (count: number) => {
-    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
-    return count.toString();
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onShare(video._id);
   };
-
-  // Get API base URL from env or default
-  const apiBaseUrl = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:3000";
-
-  const videoUrl = video.url.startsWith("http") ? video.url : `${apiBaseUrl}/downloads/${video.url}`;
 
   const handleVideoClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -114,7 +165,6 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
-    // Close description if it's expanded and click is outside description area
     const target = e.target as HTMLElement;
     const isDescriptionClick = target.closest(".description-container");
 
@@ -122,6 +172,15 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
       setIsDescriptionExpanded(false);
     }
   };
+
+  const toggleDescription = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
+
+  // ========== Render ==========
+  const videoUrl = getVideoUrl(video.url);
+  const shouldTruncateDescription = video.description && video.description.length > MAX_DESCRIPTION_LENGTH;
 
   return (
     <div className="video-item" onClick={handleVideoClick}>
@@ -137,43 +196,40 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
         preload="metadata"
       />
 
-      {/* Permanent volume indicator in corner */}
+      {/* Volume indicator badge */}
       <div className="volume-badge">{isMuted ? <SVG src="/svg/soundOff.svg" /> : <SVG src="/svg/soundOn.svg" />}</div>
 
+      {/* Video overlay with info and actions */}
       <div className="video-overlay" onClick={handleOverlayClick}>
+        {/* Video Information */}
         <div className="video-info">
+          {/* User info */}
           <div className="user-info">
             <div className="user-avatar">{video.user.telegram_name.charAt(0).toUpperCase()}</div>
             <span className="username">@{video.user.telegram_username || video.user.telegram_name}</span>
           </div>
 
+          {/* Title */}
           {video.title && <p className="title">{video.title}</p>}
 
+          {/* Description with expand/collapse */}
           {video.description && (
-            <div className="description-container">
-              <p className="description">
-                {isDescriptionExpanded
-                  ? video.description
-                  : video.description.length > MAX_DESCRIPTION_LENGTH
-                  ? `${video.description.substring(0, MAX_DESCRIPTION_LENGTH)}...`
-                  : video.description}
-              </p>
-              {video.description.length > MAX_DESCRIPTION_LENGTH && (
-                <button
-                  className="expand-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsDescriptionExpanded(!isDescriptionExpanded);
-                  }}
-                >
+            <div className={`description-container ${isDescriptionExpanded ? "expanded" : ""}`}>
+              <p className="description">{video.description}</p>
+              {shouldTruncateDescription && (
+                <button className="expand-btn" onClick={toggleDescription}>
                   {isDescriptionExpanded ? "Свернуть" : "Ещё"}
                 </button>
               )}
             </div>
           )}
 
-          <div className="stats">👁️ {formatCount(video.view_count)} views</div>
+          {/* View count */}
+          <div className="stats">
+            {formatCount(video.view_count)} <SVG src="/svg/eye.svg" />
+          </div>
 
+          {/* Tags */}
           {video.tags && video.tags.length > 0 && (
             <div className="tags">
               {video.tags.map((tag, index) => (
@@ -185,7 +241,9 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
           )}
         </div>
 
+        {/* Action buttons */}
         <div className="actions">
+          {/* Like */}
           <div className={`action-btn ${isLiked ? "active" : ""}`} onClick={handleLike}>
             <span className="icon">
               <SVG src="/svg/like.svg" />
@@ -193,6 +251,7 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
             <span className="count">{formatCount(localLikeCount)}</span>
           </div>
 
+          {/* Favorite */}
           <div className={`action-btn ${isFavorited ? "active" : ""}`} onClick={handleFavorite}>
             <span className="icon">
               <SVG src="/svg/favorite.svg" />
@@ -200,13 +259,8 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
             <span className="count">{formatCount(localFavoriteCount)}</span>
           </div>
 
-          <div
-            className="action-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onShare(video._id);
-            }}
-          >
+          {/* Share */}
+          <div className="action-btn" onClick={handleShare}>
             <span className="icon">
               <SVG src="/svg/share.svg" />
             </span>
@@ -218,48 +272,178 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
   );
 };
 
+// ======================== VideoFeed Component ========================
 export const VideoFeed = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const videoIdFromUrl = searchParams.get("video");
 
+  // State
   const [page, setPage] = useState(1);
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [showVolumeIndicator, setShowVolumeIndicator] = useState(false);
   const [initialScrollDone, setInitialScrollDone] = useState(false);
+  const [allVideos, setAllVideos] = useState<Video[]>([]);
+
+  // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isLoadingMoreRef = useRef(false);
 
+  // API queries
   const { data, isLoading, error } = useGetVideoFeedQuery({ page, limit: 10 });
-  console.log(data, error);
-
-  // Load specific video if ID is in URL
   const { data: singleVideoData } = useGetVideoByIdQuery(videoIdFromUrl || "", {
     skip: !videoIdFromUrl,
   });
 
+  // API mutations
   const [likeVideo] = useLikeVideoMutation();
   const [toggleFavorite] = useToggleFavoriteMutation();
   const [shareVideo] = useShareVideoMutation();
 
-  // Combine feed videos with the specific video if needed
-  let videos = data?.data || [];
-
-  // If we have a specific video from URL, add it to the beginning
-  if (singleVideoData?.data && videoIdFromUrl && !initialScrollDone) {
-    const existingIndex = videos.findIndex((v) => v._id === videoIdFromUrl);
-    if (existingIndex === -1) {
-      // Video not in feed, add it to the beginning
-      videos = [singleVideoData.data, ...videos];
-    } else {
-      // Video is in feed, move it to the beginning
-      const videoToMove = videos[existingIndex];
-      videos = [videoToMove, ...videos.filter((v) => v._id !== videoIdFromUrl)];
-    }
-  }
-
   const user = getCurrentUser();
 
+  // ========== Effect: Accumulate videos from pagination ==========
+  useEffect(() => {
+    if (data?.data) {
+      setAllVideos((prev) => {
+        // Avoid duplicates
+        const newVideos = data.data.filter((newVideo) => !prev.some((existingVideo) => existingVideo._id === newVideo._id));
+        return [...prev, ...newVideos];
+      });
+      isLoadingMoreRef.current = false;
+    }
+  }, [data]);
+
+  // ========== Effect: Prepend specific video from URL ==========
+  useEffect(() => {
+    if (singleVideoData?.data && videoIdFromUrl && !initialScrollDone) {
+      setAllVideos((prev) => {
+        const existingIndex = prev.findIndex((v) => v._id === videoIdFromUrl);
+        if (existingIndex === -1) {
+          // Add to beginning
+          return [singleVideoData.data, ...prev];
+        } else {
+          // Move to beginning
+          const videoToMove = prev[existingIndex];
+          return [videoToMove, ...prev.filter((v) => v._id !== videoIdFromUrl)];
+        }
+      });
+    }
+  }, [singleVideoData, videoIdFromUrl, initialScrollDone]);
+
+  // ========== Effect: Auto-scroll to specific video from URL ==========
+  useEffect(() => {
+    if (!videoIdFromUrl || !containerRef.current || allVideos.length === 0 || initialScrollDone) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      const videoIndex = allVideos.findIndex((v) => v._id === videoIdFromUrl);
+
+      if (videoIndex !== -1) {
+        const videoElement = containerRef.current?.querySelector(`[data-index="${videoIndex}"]`) as HTMLElement;
+
+        if (videoElement) {
+          videoElement.scrollIntoView({ behavior: "smooth", block: "start" });
+          setActiveVideoIndex(videoIndex);
+          setInitialScrollDone(true);
+
+          // Remove video param from URL after scrolling
+          setTimeout(() => {
+            setSearchParams({});
+          }, 1000);
+        }
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [videoIdFromUrl, allVideos, initialScrollDone, setSearchParams]);
+
+  // ========== Effect: Handle scroll to determine active video and load more ==========
+  useEffect(() => {
+    if (!containerRef.current || allVideos.length === 0) return;
+
+    const handleScroll = () => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const containerCenter = containerRect.top + containerRect.height / 2;
+
+      let closestIndex = 0;
+      let minDistance = Infinity;
+
+      // Find video closest to center of screen
+      allVideos.forEach((_, index) => {
+        const videoElement = container.querySelector(`[data-index="${index}"] .video-item`) as HTMLElement;
+
+        if (videoElement) {
+          const videoRect = videoElement.getBoundingClientRect();
+          const videoCenter = videoRect.top + videoRect.height / 2;
+          const distance = Math.abs(videoCenter - containerCenter);
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+          }
+        }
+      });
+
+      setActiveVideoIndex(closestIndex);
+
+      // Load more videos when near the end
+      if (closestIndex >= allVideos.length - PRELOAD_THRESHOLD && data?.pagination.has_more && !isLoadingMoreRef.current && !isLoading) {
+        isLoadingMoreRef.current = true;
+        setPage((prev) => prev + 1);
+      }
+    };
+
+    // Throttle scroll events
+    let scrollTimeout: ReturnType<typeof setTimeout>;
+    const throttledScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(handleScroll, SCROLL_THROTTLE_DELAY);
+    };
+
+    const container = containerRef.current;
+    container.addEventListener("scroll", throttledScroll);
+    handleScroll(); // Initial check
+
+    return () => {
+      container.removeEventListener("scroll", throttledScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [allVideos.length, data?.pagination.has_more, isLoading, data]);
+
+  // ========== Effect: Intersection Observer for active video detection ==========
+  useEffect(() => {
+    if (!containerRef.current || allVideos.length === 0) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > INTERSECTION_THRESHOLD) {
+            const index = Number(entry.target.getAttribute("data-index"));
+            setActiveVideoIndex(index);
+          }
+        });
+      },
+      {
+        threshold: [INTERSECTION_THRESHOLD],
+        root: containerRef.current,
+      }
+    );
+
+    const videoElements = containerRef.current.querySelectorAll("[data-index]");
+    videoElements.forEach((el) => observerRef.current?.observe(el));
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [allVideos.length]);
+
+  // ========== Event Handlers ==========
   const handleLike = useCallback(
     (id: string) => {
       likeVideo({
@@ -291,7 +475,7 @@ export const VideoFeed = () => {
       const link = `${window.location.origin}/video/${id}`;
       navigator.clipboard.writeText(link);
 
-      // Show Telegram share if available
+      // Show Telegram popup if available
       if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.showPopup({
           title: "Share Video",
@@ -305,124 +489,12 @@ export const VideoFeed = () => {
 
   const handleToggleMute = useCallback(() => {
     setIsMuted((prev) => !prev);
-
-    // Show volume indicator
     setShowVolumeIndicator(true);
-    setTimeout(() => setShowVolumeIndicator(false), 1000);
+    setTimeout(() => setShowVolumeIndicator(false), VOLUME_INDICATOR_TIMEOUT);
   }, []);
 
-  // Auto-scroll to specific video from URL
-  useEffect(() => {
-    if (!videoIdFromUrl || !containerRef.current || videos.length === 0 || initialScrollDone) return;
-
-    // Wait a bit for DOM to render
-    const timer = setTimeout(() => {
-      const videoIndex = videos.findIndex((v) => v._id === videoIdFromUrl);
-
-      if (videoIndex !== -1) {
-        // Scroll to the video
-        const videoElement = containerRef.current?.querySelector(`[data-index="${videoIndex}"]`) as HTMLElement;
-
-        if (videoElement) {
-          videoElement.scrollIntoView({ behavior: "smooth", block: "start" });
-          setActiveVideoIndex(videoIndex);
-          setInitialScrollDone(true);
-
-          // Remove video param from URL after scrolling
-          setTimeout(() => {
-            setSearchParams({});
-          }, 1000);
-        }
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [videoIdFromUrl, videos, initialScrollDone, setSearchParams]);
-
-  // Используем более надежный подход для определения видимого видео
-  useEffect(() => {
-    if (!containerRef.current || videos.length === 0) return;
-
-    const handleScroll = () => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const containerRect = container.getBoundingClientRect();
-      const containerCenter = containerRect.top + containerRect.height / 2;
-
-      let closestIndex = 0;
-      let minDistance = Infinity;
-
-      // Находим видео, которое ближе всего к центру экрана
-      videos.forEach((_, index) => {
-        const videoElement = container.querySelector(`[data-index="${index}"] .video-item`) as HTMLElement;
-        if (videoElement) {
-          const videoRect = videoElement.getBoundingClientRect();
-          const videoCenter = videoRect.top + videoRect.height / 2;
-          const distance = Math.abs(videoCenter - containerCenter);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestIndex = index;
-          }
-        }
-      });
-
-      setActiveVideoIndex(closestIndex);
-
-      // Load more videos when near the end
-      if (closestIndex >= videos.length - 3 && data?.pagination.has_more) {
-        setPage((prev) => prev + 1);
-      }
-    };
-
-    // Используем throttle для оптимизации
-    let scrollTimeout: ReturnType<typeof setTimeout>;
-    const throttledScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(handleScroll, 100);
-    };
-
-    const container = containerRef.current;
-    container.addEventListener("scroll", throttledScroll);
-
-    // Initial check
-    handleScroll();
-
-    return () => {
-      container.removeEventListener("scroll", throttledScroll);
-      clearTimeout(scrollTimeout);
-    };
-  }, [videos.length, data?.pagination.has_more, videos]);
-
-  // Альтернативный вариант с Intersection Observer (оставляем как запасной)
-  useEffect(() => {
-    if (!containerRef.current || videos.length === 0) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.7) {
-            const index = Number(entry.target.getAttribute("data-index"));
-            setActiveVideoIndex(index);
-          }
-        });
-      },
-      {
-        threshold: [0.7],
-        root: containerRef.current,
-      }
-    );
-
-    const videoElements = containerRef.current.querySelectorAll("[data-index]");
-    videoElements.forEach((el) => observerRef.current?.observe(el));
-
-    return () => {
-      observerRef.current?.disconnect();
-    };
-  }, [videos.length]);
-
-  if (isLoading && videos.length === 0) {
+  // ========== Render States ==========
+  if (isLoading && allVideos.length === 0) {
     return (
       <div className="video-feed loading">
         <div className="loader">Loading videos...</div>
@@ -441,7 +513,7 @@ export const VideoFeed = () => {
     );
   }
 
-  if (videos.length === 0) {
+  if (allVideos.length === 0) {
     return (
       <div className="video-feed empty">
         <div className="empty-message">
@@ -452,6 +524,7 @@ export const VideoFeed = () => {
     );
   }
 
+  // ========== Main Render ==========
   return (
     <div className="video-feed" ref={containerRef}>
       {/* Global volume indicator */}
@@ -461,7 +534,8 @@ export const VideoFeed = () => {
         </div>
       )}
 
-      {videos.map((video, index) => (
+      {/* Video list */}
+      {allVideos.map((video, index) => (
         <div key={video._id} data-index={index}>
           <VideoItem
             video={video}
@@ -475,7 +549,8 @@ export const VideoFeed = () => {
         </div>
       ))}
 
-      {isLoading && videos.length > 0 && <div className="loading-more">Loading more...</div>}
+      {/* Loading indicator for pagination */}
+      {isLoading && allVideos.length > 0 && <div className="loading-more">Loading more videos...</div>}
     </div>
   );
 };
