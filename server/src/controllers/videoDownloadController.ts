@@ -60,7 +60,7 @@ export const downloadVideo = async (req: Request, res: Response) => {
     // Determine platform and cookies
     const platform = detectPlatform(url);
     let cookiesOption = "";
-    
+
     if (platform === "instagram") {
       const cookiesPath = path.join(process.cwd(), "important", "instagram.txt");
       cookiesOption = `--cookies "${cookiesPath}"`;
@@ -72,9 +72,8 @@ export const downloadVideo = async (req: Request, res: Response) => {
     }
 
     // Download video using yt-dlp with cookies
-    // --no-write-cookies: не перезаписывать cookies файл после использования
-    const command = `yt-dlp ${cookiesOption} --no-write-cookies --no-playlist -o "${videoPath}" "${url}"`;
-    console.log(`🔧 Command: yt-dlp ${cookiesOption ? '[with cookies]' : ''} --no-write-cookies --no-playlist`);
+    const command = `yt-dlp ${cookiesOption} --no-playlist -o "${videoPath}" "${url}"`;
+    console.log(`🔧 Command: yt-dlp ${cookiesOption ? "[with cookies]" : ""} --no-playlist -o "${videoPath}"`);
 
     const { stdout, stderr } = await execAsync(command, {
       timeout: 300000, // 5 minutes timeout
