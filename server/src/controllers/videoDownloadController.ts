@@ -57,8 +57,23 @@ export const downloadVideo = async (req: Request, res: Response) => {
     console.log(`📥 Downloading video from: ${url}`);
     console.log(`💾 Saving to: ${videoPath}`);
 
-    // Download video using yt-dlp with better options
-    const command = `yt-dlp -o "${videoPath}" "${url}"`;
+    // Determine platform and cookies
+    const platform = detectPlatform(url);
+    let cookiesOption = "";
+    
+    if (platform === "instagram") {
+      const cookiesPath = path.join(process.cwd(), "important", "instagram.txt");
+      cookiesOption = `--cookies "${cookiesPath}"`;
+      console.log("🍪 Using Instagram cookies");
+    } else if (platform === "youtube") {
+      const cookiesPath = path.join(process.cwd(), "important", "youtube.txt");
+      cookiesOption = `--cookies "${cookiesPath}"`;
+      console.log("🍪 Using YouTube cookies");
+    }
+
+    // Download video using yt-dlp with cookies
+    const command = `yt-dlp ${cookiesOption} --no-playlist -o "${videoPath}" "${url}"`;
+    console.log(`🔧 Command: ${command}`);
 
     const { stdout, stderr } = await execAsync(command, {
       timeout: 300000, // 5 minutes timeout
