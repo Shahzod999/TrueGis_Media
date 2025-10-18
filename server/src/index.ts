@@ -36,26 +36,33 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:1995",
-  "https://gxfl20sh-1995.euw.devtunnels.ms",
-  "https://gxfl20sh-5173.euw.devtunnels.ms",
-  "https://gxfl20sh-3000.euw.devtunnels.ms",
-  "https://your-frontend-app.vercel.app",
-  "https://hammasiuy.com",
-  "https://www.hammasiuy.com",
-  "https://home.admin13.uz",
-  "http://localhost:5173",
-];
+const corsOpts = {
+  origin: (origin: any, callback: any) => {
+    const allowedOrigins = [
+      "http://138.197.178.202",
+      "http://localhost:5173",
+      "http://localhost:3001",
+      "http://localhost:3000",
+      "https://true-gis-admin-psi.vercel.app",
+      "http://192.168.43.22:5173",
+      "http://192.168.43.22",
+      "http://172.20.10.10",
+      "http://172.20.10.10:5173",
+      "https://true-gis-bot-admin.vercel.app",
+      "https://gxfl20sh-5173.euw.devtunnels.ms",
+      "https://media.admin13.uz",
+    ];
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true); // Allow requests from allowed origins or non-browser tools
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["POST", "GET", "HEAD", "PUT", "DELETE"],
+  credentials: true,
+};
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "user-id"],
-  })
-);
+app.use(cors(corsOpts));
 
 // Middleware для логирования запросов
 app.use((req, _res, next) => {
@@ -63,21 +70,8 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Add JSON parsing error handler with no limits
-app.use(
-  express.json({
-    limit: "50mb",
-    verify: (_req: express.Request, res: any, buf, _encoding) => {
-      try {
-        JSON.parse(buf.toString());
-      } catch (e) {
-        res.status(400).json({ success: false, message: "Invalid JSON payload" });
-        throw new Error("Invalid JSON");
-      }
-    },
-  })
-);
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/downloads", express.static(downloadPath));

@@ -238,7 +238,7 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
 export const VideoFeed = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const videoIdFromUrl = searchParams.get("video");
-  
+
   const [page, setPage] = useState(1);
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
@@ -248,7 +248,8 @@ export const VideoFeed = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const { data, isLoading, error } = useGetVideoFeedQuery({ page, limit: 10 });
-  
+  console.log(data, error);
+
   // Load specific video if ID is in URL
   const { data: singleVideoData } = useGetVideoByIdQuery(videoIdFromUrl || "", {
     skip: !videoIdFromUrl,
@@ -260,20 +261,20 @@ export const VideoFeed = () => {
 
   // Combine feed videos with the specific video if needed
   let videos = data?.data || [];
-  
+
   // If we have a specific video from URL, add it to the beginning
   if (singleVideoData?.data && videoIdFromUrl && !initialScrollDone) {
-    const existingIndex = videos.findIndex(v => v._id === videoIdFromUrl);
+    const existingIndex = videos.findIndex((v) => v._id === videoIdFromUrl);
     if (existingIndex === -1) {
       // Video not in feed, add it to the beginning
       videos = [singleVideoData.data, ...videos];
     } else {
       // Video is in feed, move it to the beginning
       const videoToMove = videos[existingIndex];
-      videos = [videoToMove, ...videos.filter(v => v._id !== videoIdFromUrl)];
+      videos = [videoToMove, ...videos.filter((v) => v._id !== videoIdFromUrl)];
     }
   }
-  
+
   const user = getCurrentUser();
 
   const handleLike = useCallback(
@@ -333,17 +334,17 @@ export const VideoFeed = () => {
 
     // Wait a bit for DOM to render
     const timer = setTimeout(() => {
-      const videoIndex = videos.findIndex(v => v._id === videoIdFromUrl);
-      
+      const videoIndex = videos.findIndex((v) => v._id === videoIdFromUrl);
+
       if (videoIndex !== -1) {
         // Scroll to the video
         const videoElement = containerRef.current?.querySelector(`[data-index="${videoIndex}"]`) as HTMLElement;
-        
+
         if (videoElement) {
           videoElement.scrollIntoView({ behavior: "smooth", block: "start" });
           setActiveVideoIndex(videoIndex);
           setInitialScrollDone(true);
-          
+
           // Remove video param from URL after scrolling
           setTimeout(() => {
             setSearchParams({});
