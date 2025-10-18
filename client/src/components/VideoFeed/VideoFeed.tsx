@@ -35,7 +35,6 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
   const [isFavorited, setIsFavorited] = useState(false);
   const [localLikeCount, setLocalLikeCount] = useState(video.like_count);
   const [localFavoriteCount, setLocalFavoriteCount] = useState(video.favorite_count);
-  const [videoError, setVideoError] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [recordView] = useRecordViewMutation();
 
@@ -104,13 +103,7 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
 
   const videoUrl = video.url.startsWith("http") ? video.url : `${apiBaseUrl}/downloads/${video.url}`;
 
-  const handleVideoError = () => {
-    console.error("Failed to load video:", videoUrl);
-    setVideoError(true);
-  };
-
   const handleVideoClick = (e: React.MouseEvent) => {
-    // Toggle mute/unmute when clicking on video
     const target = e.target as HTMLElement;
     const isVideoClick = target.classList.contains("video-player");
 
@@ -132,30 +125,20 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
 
   return (
     <div className="video-item" onClick={handleVideoClick}>
-      {videoError ? (
-        <div className="video-error">
-          <p>❌ Failed to load video</p>
-          <p className="error-url">{video.url}</p>
-        </div>
-      ) : (
-        <>
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={video.thumbnail}
-            loop
-            playsInline
-            muted={isMuted}
-            className="video-player"
-            onError={handleVideoError}
-            onLoadedData={() => console.log("Video loaded:", videoUrl)}
-            preload="metadata"
-          />
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        poster={video.thumbnail}
+        loop
+        playsInline
+        muted={isMuted}
+        className="video-player"
+        onLoadedData={() => console.log("Video loaded:", videoUrl)}
+        preload="metadata"
+      />
 
-          {/* Permanent volume indicator in corner */}
-          <div className="volume-badge">{isMuted ? "🔇" : "🔊"}</div>
-        </>
-      )}
+      {/* Permanent volume indicator in corner */}
+      <div className="volume-badge">{isMuted ? <SVG src="/svg/soundOff.svg" /> : <SVG src="/svg/soundOn.svg" />}</div>
 
       <div className="video-overlay" onClick={handleOverlayClick}>
         <div className="video-info">
@@ -474,7 +457,7 @@ export const VideoFeed = () => {
       {/* Global volume indicator */}
       {showVolumeIndicator && (
         <div className="global-volume-indicator">
-          <span className="volume-icon">{isMuted ? "🔇" : "🔊"}</span>
+          <span className="volume-icon">{isMuted ? <SVG src="/svg/soundOff.svg" /> : <SVG src="/svg/soundOn.svg" />}</span>
         </div>
       )}
 

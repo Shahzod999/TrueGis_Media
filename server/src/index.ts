@@ -75,6 +75,61 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Custom middleware for video streaming with range support (required for iOS)
+app.use("/downloads", (req, res, next) => {
+  const filePath = path.join(downloadPath, req.path);
+  
+  // Check if file exists
+  if (!fs.existsSync(filePath)) {
+    return next();
+  }
+
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  // Set CORS headers for video files
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Range");
+  res.setHeader("Access-Control-Expose-Headers", "Accept-Ranges, Content-Length, Content-Range");
+
+  if (range) {
+    // Parse range header
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+    const chunksize = end - start + 1;
+
+    // Create read stream
+    const file = fs.createReadStream(filePath, { start, end });
+
+    // Set headers for partial content
+    const head = {
+      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": "video/mp4",
+      "Cache-Control": "public, max-age=31536000",
+    };
+
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    // No range header - send entire file
+    const head = {
+      "Content-Length": fileSize,
+      "Content-Type": "video/mp4",
+      "Accept-Ranges": "bytes",
+      "Cache-Control": "public, max-age=31536000",
+    };
+
+    res.writeHead(200, head);
+    fs.createReadStream(filePath).pipe(res);
+  }
+});
+
+// Fallback to static serving for non-video files
 app.use("/downloads", express.static(downloadPath));
 
 // Тестовый маршрут для проверки работы API
