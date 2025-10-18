@@ -55,11 +55,12 @@ const corsOpts = {
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true); // Allow requests from allowed origins or non-browser tools
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, false); // Reject instead of throwing error
     }
   },
-  methods: ["POST", "GET", "HEAD", "PUT", "DELETE"],
+  methods: ["POST", "GET", "HEAD", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOpts));
@@ -148,7 +149,6 @@ app.get("/api/proxy/image", async (req, res) => {
     res.set({
       "Content-Type": contentType,
       "Cache-Control": "public, max-age=86400", // Cache for 24 hours
-      "Access-Control-Allow-Origin": "*",
     });
 
     res.send(response.data);
