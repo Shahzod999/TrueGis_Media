@@ -61,7 +61,7 @@ const socialVideoSchema = new Schema<ISocialVideo>(
     },
     url: { type: String, required: true },
     file_id: { type: String, required: true },
-    thumbnail: { type: String, required: true },
+    thumbnail: { type: String, required: false, default: "" },
     source_url: { type: String, required: true },
     source_platform: { 
       type: String, 

@@ -90,16 +90,17 @@ export const downloadVideo = async (req: Request, res: Response) => {
       throw new Error("Downloaded file not found");
     }
 
-    // Get video metadata using yt-dlp
+    // Get video metadata using yt-dlp (with cookies if available)
     let metadata: any = {};
     try {
-      const metadataCommand = `yt-dlp --dump-json "${url}"`;
+      const metadataCommand = `yt-dlp ${cookiesOption} --dump-json "${url}"`;
       const { stdout: metadataJson } = await execAsync(metadataCommand, {
         timeout: 30000,
       });
       metadata = JSON.parse(metadataJson);
+      console.log("✅ Metadata fetched successfully");
     } catch (metaError) {
-      console.log("⚠️ Could not fetch metadata:", metaError);
+      console.log("⚠️ Could not fetch metadata, using defaults");
     }
 
     // Create video record in database
