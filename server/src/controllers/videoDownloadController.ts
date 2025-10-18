@@ -72,8 +72,9 @@ export const downloadVideo = async (req: Request, res: Response) => {
     }
 
     // Download video using yt-dlp with cookies
-    const command = `yt-dlp ${cookiesOption} --no-playlist -o "${videoPath}" "${url}"`;
-    console.log(`🔧 Command: ${command}`);
+    // --no-write-cookies: не перезаписывать cookies файл после использования
+    const command = `yt-dlp ${cookiesOption} --no-write-cookies --no-playlist -o "${videoPath}" "${url}"`;
+    console.log(`🔧 Command: yt-dlp ${cookiesOption ? '[with cookies]' : ''} --no-write-cookies --no-playlist`);
 
     const { stdout, stderr } = await execAsync(command, {
       timeout: 300000, // 5 minutes timeout

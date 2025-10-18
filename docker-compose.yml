@@ -15,4 +15,4 @@ services:
     volumes:
       - ./server/downloads:/app/downloads
       - ./server/uploads:/app/uploads
-      - ./important:/app/important:ro
+      - ./important:/app/important
