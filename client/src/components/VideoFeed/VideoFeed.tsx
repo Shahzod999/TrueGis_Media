@@ -41,9 +41,15 @@ const formatCount = (count: number): string => {
 
 /**
  * Get video URL with proper base URL
+ * Handles both cloud storage URLs and legacy local URLs
  */
 const getVideoUrl = (videoUrl: string): string => {
-  if (videoUrl.startsWith("http")) return videoUrl;
+  // If it's already a full URL (cloud storage), return as is
+  if (videoUrl.startsWith("http://") || videoUrl.startsWith("https://")) {
+    return videoUrl;
+  }
+  
+  // Legacy support: for local files, construct local URL
   const apiBaseUrl = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:3000";
   return `${apiBaseUrl}/downloads/${videoUrl}`;
 };

@@ -1,13 +1,19 @@
 import { Request, Response } from "express";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { access, unlink } from "fs/promises";
+import { access, unlink, readFile } from "fs/promises";
 import { randomBytes } from "crypto";
 import { constants } from "fs";
 import path from "path";
+import FormData from "form-data";
+import axios from "axios";
 import SocialVideo from "../models/socialVideoModel";
 
 const execAsync = promisify(exec);
+
+// Storage API endpoint
+const STORAGE_API_URL = "https://dev.admin13.uz/homepage/v1/uploads/video/single";
+const STORAGE_FOLDER = "videos";
 
 // Generate unique filename
 function generateUniqueFilename(): string {
@@ -27,6 +33,57 @@ function detectPlatform(url: string): string {
   if (url.includes("pinterest.com")) return "pinterest";
   if (url.includes("reddit.com")) return "reddit";
   return "other";
+}
+
+// Types for storage API response
+interface StorageApiResponse {
+  success: boolean;
+  message: string;
+  data: {
+    url: string;
+    key: string;
+    folder: string;
+  };
+}
+
+// Upload video to external storage
+async function uploadToStorage(filePath: string): Promise<{ url: string; key: string }> {
+  try {
+    console.log(`☁️ Uploading video to storage: ${filePath}`);
+
+    // Read file as buffer
+    const fileBuffer = await readFile(filePath);
+    const fileName = path.basename(filePath);
+
+    // Create form data
+    const formData = new FormData();
+    formData.append("video", fileBuffer, {
+      filename: fileName,
+      contentType: "video/mp4",
+    });
+    formData.append("folder", STORAGE_FOLDER);
+
+    // Upload to storage
+    const response = await axios.post<StorageApiResponse>(STORAGE_API_URL, formData, {
+      headers: {
+        ...formData.getHeaders(),
+      },
+      timeout: 300000, // 5 minutes
+    });
+
+    if (response.data && response.data.success && response.data.data) {
+      console.log("✅ Video uploaded to storage:", response.data.data.url);
+      return {
+        url: response.data.data.url,
+        key: response.data.data.key,
+      };
+    } else {
+      throw new Error("Invalid response from storage API");
+    }
+  } catch (error: any) {
+    console.error("❌ Error uploading to storage:", error.message);
+    throw new Error(`Failed to upload to storage: ${error.message}`);
+  }
 }
 
 // Download video from URL using yt-dlp
@@ -103,15 +160,35 @@ export const downloadVideo = async (req: Request, res: Response) => {
       console.log("⚠️ Could not fetch metadata, using defaults");
     }
 
-    // Create video record in database
+    // Upload video to external storage
+    let storageUrl: string;
+    let storageKey: string;
+    
+    try {
+      const uploadResult = await uploadToStorage(videoPath);
+      storageUrl = uploadResult.url;
+      storageKey = uploadResult.key;
+      console.log("✅ Video uploaded to storage successfully");
+    } catch (uploadError: any) {
+      console.error("❌ Failed to upload to storage:", uploadError.message);
+      // Clean up local file
+      try {
+        await unlink(videoPath);
+      } catch (unlinkError) {
+        console.error("⚠️ Failed to delete local file:", unlinkError);
+      }
+      throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
+
+    // Create video record in database with storage URL
     const videoData = {
       user: {
         telegram_id: user.telegram_id,
         telegram_name: user.telegram_name,
         telegram_username: user.telegram_username || undefined,
       },
-      url: `${uniqueName}.mp4`, // Store relative path
-      file_id: user.file_id || `local_${uniqueName}`, // For local storage
+      url: storageUrl, // Store cloud storage URL
+      file_id: storageKey, // Store storage key
       thumbnail: metadata.thumbnail || "",
       source_url: url,
       source_platform: detectPlatform(url),
@@ -131,12 +208,21 @@ export const downloadVideo = async (req: Request, res: Response) => {
 
     console.log("✅ Video saved to database:", video._id);
 
+    // Delete local file after successful upload and database save
+    try {
+      await unlink(videoPath);
+      console.log("🗑️ Local video file deleted:", videoPath);
+    } catch (unlinkError) {
+      console.error("⚠️ Failed to delete local file (not critical):", unlinkError);
+    }
+
     res.status(201).json({
       success: true,
-      message: "Video downloaded and saved successfully",
+      message: "Video downloaded, uploaded to storage, and saved successfully",
       data: {
         video_id: video._id,
-        file_path: videoPath,
+        storage_url: storageUrl,
+        storage_key: storageKey,
         platform: videoData.source_platform,
         title: videoData.title,
         duration: videoData.duration,
@@ -194,16 +280,37 @@ export const uploadVideo = async (req: Request, res: Response) => {
     }
 
     const platform = source_url ? detectPlatform(source_url) : "other";
+    const videoPath = req.file.path;
 
-    // Create video record
+    // Upload video to external storage
+    let storageUrl: string;
+    let storageKey: string;
+    
+    try {
+      const uploadResult = await uploadToStorage(videoPath);
+      storageUrl = uploadResult.url;
+      storageKey = uploadResult.key;
+      console.log("✅ Video uploaded to storage successfully");
+    } catch (uploadError: any) {
+      console.error("❌ Failed to upload to storage:", uploadError.message);
+      // Clean up local file
+      try {
+        await unlink(videoPath);
+      } catch (unlinkError) {
+        console.error("⚠️ Failed to delete local file:", unlinkError);
+      }
+      throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
+
+    // Create video record with storage URL
     const videoData = {
       user: {
         telegram_id: user.telegram_id,
         telegram_name: user.telegram_name,
         telegram_username: user.telegram_username || undefined,
       },
-      url: req.file.filename,
-      file_id: `local_${req.file.filename}`,
+      url: storageUrl, // Store cloud storage URL
+      file_id: storageKey, // Store storage key
       thumbnail: "",
       source_url: source_url || null,
       source_platform: platform,
@@ -223,12 +330,21 @@ export const uploadVideo = async (req: Request, res: Response) => {
 
     console.log("✅ Video uploaded and saved:", video._id);
 
+    // Delete local file after successful upload
+    try {
+      await unlink(videoPath);
+      console.log("🗑️ Local video file deleted:", videoPath);
+    } catch (unlinkError) {
+      console.error("⚠️ Failed to delete local file (not critical):", unlinkError);
+    }
+
     res.status(201).json({
       success: true,
-      message: "Video uploaded successfully",
+      message: "Video uploaded to storage and saved successfully",
       data: {
         video_id: video._id,
-        file_name: req.file.filename,
+        storage_url: storageUrl,
+        storage_key: storageKey,
         file_size: req.file.size,
         platform: platform,
       },
