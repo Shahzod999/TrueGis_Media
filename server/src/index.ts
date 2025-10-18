@@ -36,43 +36,34 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 const app = express();
 
-// const corsOpts = {
-//   origin: (origin: any, callback: any) => {
-//     const allowedOrigins = [
-//       "http://138.197.178.202",
-//       "http://localhost:5173",
-//       "http://localhost:3001",
-//       "http://localhost:3000",
-//       "https://true-gis-admin-psi.vercel.app",
-//       "http://192.168.43.22:5173",
-//       "http://192.168.43.22",
-//       "http://172.20.10.10",
-//       "http://172.20.10.10:5173",
-//       "https://true-gis-bot-admin.vercel.app",
-//       "https://gxfl20sh-5173.euw.devtunnels.ms",
-//       "https://media.admin13.uz",
-//     ];
-//     if (allowedOrigins.includes(origin) || !origin) {
-//       callback(null, true); // Allow requests from allowed origins or non-browser tools
-//     } else {
-//       callback(null, false); // Reject instead of throwing error
-//     }
-//   },
-//   methods: ["POST", "GET", "HEAD", "PUT", "DELETE", "OPTIONS"],
-//   credentials: true,
-//   optionsSuccessStatus: 200,
-// };
+const corsOpts = {
+  origin: (origin: any, callback: any) => {
+    const allowedOrigins = [
+      "http://138.197.178.202",
+      "http://localhost:5173",
+      "http://localhost:3001",
+      "http://localhost:3000",
+      "https://true-gis-admin-psi.vercel.app",
+      "http://192.168.43.22:5173",
+      "http://192.168.43.22",
+      "http://172.20.10.10",
+      "http://172.20.10.10:5173",
+      "https://true-gis-bot-admin.vercel.app",
+      "https://gxfl20sh-5173.euw.devtunnels.ms",
+      "https://media.admin13.uz",
+    ];
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true); // Allow requests from allowed origins or non-browser tools
+    } else {
+      callback(null, false); // Reject instead of throwing error
+    }
+  },
+  methods: ["POST", "GET", "HEAD", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
-// app.use(cors(corsOpts));
-
-app.use(
-  cors({
-    origin: "*",
-    methods: ["POST", "GET", "HEAD", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-    optionsSuccessStatus: 200,
-  })
-);
+app.use(cors(corsOpts));
 
 // Middleware для логирования запросов
 app.use((req, _res, next) => {
