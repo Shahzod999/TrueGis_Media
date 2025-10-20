@@ -48,7 +48,7 @@ const getVideoUrl = (videoUrl: string): string => {
   if (videoUrl.startsWith("http://") || videoUrl.startsWith("https://")) {
     return videoUrl;
   }
-  
+
   // Legacy support: for local files, construct local URL
   const apiBaseUrl = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:3000";
   return `${apiBaseUrl}/downloads/${videoUrl}`;
@@ -82,7 +82,6 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
   // API mutations
   const [recordView] = useRecordViewMutation();
 
-  // ========== Effect: Handle video playback on active state change ==========
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
@@ -212,7 +211,7 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
           {/* User info */}
           <div className="user-info">
             <div className="user-avatar">{video.user.telegram_name.charAt(0).toUpperCase()}</div>
-            <span className="username">@{video.user.telegram_username || video.user.telegram_name}</span>
+            <span className="username">{video.user.telegram_name || `@${video.user.telegram_username}`}</span>
           </div>
 
           {/* Title */}
@@ -251,17 +250,13 @@ const VideoItem = ({ video, isActive, isMuted, onToggleMute, onLike, onFavorite,
         <div className="actions">
           {/* Like */}
           <div className={`action-btn ${isLiked ? "active" : ""}`} onClick={handleLike}>
-            <span className="icon">
-              <SVG src="/svg/like.svg" />
-            </span>
+            <span className="icon">{isLiked ? <SVG src="/svg/likeOn.svg" /> : <SVG src="/svg/like.svg" />}</span>
             <span className="count">{formatCount(localLikeCount)}</span>
           </div>
 
           {/* Favorite */}
           <div className={`action-btn ${isFavorited ? "active" : ""}`} onClick={handleFavorite}>
-            <span className="icon">
-              <SVG src="/svg/favorite.svg" />
-            </span>
+            <span className="icon">{isFavorited ? <SVG src="/svg/favoriteOn.svg" /> : <SVG src="/svg/favorite.svg" />}</span>
             <span className="count">{formatCount(localFavoriteCount)}</span>
           </div>
 

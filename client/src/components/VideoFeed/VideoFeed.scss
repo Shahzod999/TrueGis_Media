@@ -300,21 +300,6 @@
         transform: scale(0.9);
       }
 
-      &.active {
-        svg {
-          fill: #FF2D55;
-          stroke: #FF2D55;
-
-          path {
-            fill: #FF2D55;
-            stroke: #FF2D55;
-          }
-        }
-
-        .icon {
-          transform: scale(1.2);
-        }
-      }
 
       .icon {
         font-size: 24px;
