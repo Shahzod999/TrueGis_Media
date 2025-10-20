@@ -272,7 +272,7 @@
   .actions {
     position: absolute;
     right: 12px;
-    bottom: 120px;
+    bottom: 150px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -292,8 +292,8 @@
       transition: all 0.2s;
 
       svg {
-        width: 24px;
-        height: 24px;
+        width: 30px;
+        height: 30px;
       }
 
       &:active {
@@ -328,7 +328,6 @@
 
     .actions {
       right: 8px;
-      bottom: 100px;
       gap: 16px;
 
       .action-btn {
