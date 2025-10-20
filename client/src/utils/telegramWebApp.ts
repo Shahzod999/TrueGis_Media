@@ -42,9 +42,9 @@ export const initTelegramWebApp = () => {
 
     // Запрашиваем полноэкранный режим
     // Метод может отсутствовать в типах, но присутствовать в реальном API
-    if (typeof (tg as any).requestFullscreen === "function") {
-      (tg as any).requestFullscreen();
-    }
+    // if (typeof (tg as any).requestFullscreen === "function") {
+    //   (tg as any).requestFullscreen();
+    // }
 
     // Вызываем тактильную вибрацию
     hapticVibration("rigid");
