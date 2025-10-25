@@ -82,3 +82,9 @@ docker-compose restart nginx
 //////
 
 getMyProperties теперь надо отправлять token
+
+
+
+
+<!-- gul раздел -->
+<!-- пусть homepage сервер добавляет компанию -->

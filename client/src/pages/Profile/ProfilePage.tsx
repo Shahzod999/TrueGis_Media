@@ -76,15 +76,11 @@ const ProfilePage = () => {
       <div className="profile-page-container">
         <div className="profile-tabs">
           <button className={`tab ${activeTab === "videos" ? "active" : ""}`} onClick={() => setActiveTab("videos")}>
-            <span className="icon">
-              <SVG src="/svg/reels.svg" />
-            </span>
+            <SVG src="/svg/reels.svg" />
             My Videos
           </button>
           <button className={`tab ${activeTab === "favorites" ? "active" : ""}`} onClick={() => setActiveTab("favorites")}>
-            <span className="icon">
-              <SVG src="/svg/favorite.svg" />
-            </span>
+            <SVG src="/svg/favorite.svg" />
             Favorites
           </button>
         </div>

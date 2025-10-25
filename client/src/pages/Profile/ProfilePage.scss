@@ -94,10 +94,6 @@
         stroke: var(--hint-color);
       }
 
-      .icon {
-        font-size: 20px;
-      }
-
       &.active {
         color: var(--button-color);
         background: color-mix(in srgb, var(--button-color), transparent 80%);
